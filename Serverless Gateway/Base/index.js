@@ -38,7 +38,13 @@ else{
 }
 
 function decodeData(body) {
-    const data = JSON.parse(body).data;
+    var data;
+    if (typeof body == 'object'){
+        data = body.data;
+    }
+    else{
+        data = JSON.parse(body).data;
+    }
     const decoded = web3.eth.abi.decodeParameters(['bytes4', 'bytes', 'address', 'uint256'], data);
     return {
         functionSelector: decoded[0],
