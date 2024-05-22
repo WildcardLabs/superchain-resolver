@@ -88,15 +88,19 @@ async function handleCoinAddr(callData, authorized, blockNumber, res) {
 
     const decodedVars = web3.eth.abi.decodeParameters(['bytes32', 'uint256'], callData);
     const node = decodedVars[0];
-    const coinType = Number(decodedVars[1]);
+    var coinType;
+    coinType = Number(decodedVars[1]);
     var rawresult;
     rawresult = await contract.methods.addrAndTimestamp(node, coinType, authorized).call({},blockNumber);
 
     if (rawresult == '0x'){
-       if (coinType > 2147483648){
-          rawresult = await contract.methods.addrAndTimestamp(node, 2147483648, authorized).call({},blockNumber); 
+       if (coinType > 2147483648){ 
+          rawresult = await contract.methods.addrAndTimestamp(node, 2147483648, authorized).call({},blockNumber);
           if (rawresult == '0x'){
              return res.send({"data": rawresult});  
+          }
+          else{
+            coinType = 2147483648;
           }
        }
        else{
