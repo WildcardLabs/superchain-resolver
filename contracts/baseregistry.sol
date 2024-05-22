@@ -89,7 +89,7 @@ struct coinAddr {bytes addr;}
 struct content {bytes content;}
     mapping(bytes32 => mapping(address => content)) public contentOf;
 
-struct _text {string text;}
+struct _text {bytes text;}
     mapping(bytes32 => mapping(string => mapping(address => _text))) public textOf;
 
 
@@ -118,7 +118,7 @@ function setAddr(
         uint256 coinType,
         bytes memory a
     ) public {
-        coinAddrOf[node][coinType][msg.sender].addr = a;
+        coinAddrOf[node][coinType][msg.sender].addr = abi.encode(a, block.timestamp);
         coinHashOf[node][coinType][msg.sender].hash = keccak256(abi.encodePacked(a));
         emit addrChanged(node, coinType, a, msg.sender);
     }
@@ -133,7 +133,7 @@ function setContenthash(
         bytes32 node,
         bytes memory _contenthash
     ) external {
-        contentOf[node][msg.sender].content = _contenthash;
+        contentOf[node][msg.sender].content = abi.encode(_contenthash, block.timestamp);
         contentHashOf[node][msg.sender].hash = keccak256(abi.encodePacked(_contenthash));
         emit contenthashChanged(node, _contenthash, msg.sender);
     }
@@ -150,7 +150,7 @@ function setText(
         string calldata key,
         string calldata value
     ) external {
-        textOf[node][key][msg.sender].text = value;
+        textOf[node][key][msg.sender].text = abi.encode(value, block.timestamp);
         textHashOf[node][keccak256(abi.encodePacked(key))][msg.sender].hash = keccak256(abi.encodePacked(value));
         emit textChanged(node, key, value, msg.sender);
     }
@@ -159,10 +159,27 @@ function addr(
         bytes32 node,
         address owner
     ) public view returns(address) {
-        return address(bytes20(coinAddrOf[node][60][owner].addr));
+        (bytes memory addrEth,) = abi.decode(coinAddrOf[node][60][owner].addr, (bytes, uint256));
+        return address(bytes20(addrEth));
+    }
+
+function addrAndTimestamp(
+        bytes32 node,
+        address owner
+    ) public view returns(bytes memory) {
+        return coinAddrOf[node][60][owner].addr;
     }
 
 function addr(
+        bytes32 node,
+        uint256 coinType,
+        address owner
+    ) public view returns(bytes memory) {
+        (bytes memory addrEth,) = abi.decode(coinAddrOf[node][coinType][owner].addr, (bytes, uint256));
+        return addrEth;
+    }
+
+function addrAndTimestamp(
         bytes32 node,
         uint256 coinType,
         address owner
@@ -174,6 +191,14 @@ function contenthash(
         bytes32 node,
         address owner
     ) public view returns(bytes memory) {
+        (bytes memory content_,) = abi.decode(contentOf[node][owner].content, (bytes, uint256));
+        return content_;
+    }
+
+function contenthashAndTimestamp(
+        bytes32 node,
+        address owner
+    ) public view returns(bytes memory) {
         return contentOf[node][owner].content;
     }
 
@@ -182,6 +207,15 @@ function text(
         string memory key,
         address owner
     ) public view returns(string memory) {
+        (string memory text_,) = abi.decode(textOf[node][key][owner].text, (string, uint256));
+        return text_;
+    }
+
+function textAndTimestamp(
+        bytes32 node,
+        string memory key,
+        address owner
+    ) public view returns(bytes memory) {
         return textOf[node][key][owner].text;
     }
 
