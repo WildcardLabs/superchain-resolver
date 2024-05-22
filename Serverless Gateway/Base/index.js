@@ -6,10 +6,10 @@ const web3 = new Web3(process.env.RPC);
 const withdrawal = process.env.L2ToL1MessagePasser;
 const registry = process.env.REGISTRY;
 const abi = [
-  {"inputs":[{"internalType":"bytes32","name":"node","type":"bytes32"},{"internalType":"uint256","name":"coinType","type":"uint256"},{"internalType":"address","name":"owner","type":"address"}],"name":"addr","outputs":[{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"bytes32","name":"node","type":"bytes32"},{"internalType":"address","name":"owner","type":"address"}],"name":"addr","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"bytes32","name":"node","type":"bytes32"},{"internalType":"address","name":"owner","type":"address"}],"name":"contenthash","outputs":[{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"bytes32","name":"node","type":"bytes32"},{"internalType":"string","name":"key","type":"string"},{"internalType":"address","name":"owner","type":"address"}],"name":"text","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}
+  {"inputs":[{"internalType":"bytes32","name":"node","type":"bytes32"},{"internalType":"uint256","name":"coinType","type":"uint256"},{"internalType":"address","name":"owner","type":"address"}],"name":"addrAndTimestamp","outputs":[{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"internalType":"bytes32","name":"node","type":"bytes32"},{"internalType":"address","name":"owner","type":"address"}],"name":"addrAndTimestamp","outputs":[{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"internalType":"bytes32","name":"node","type":"bytes32"},{"internalType":"address","name":"owner","type":"address"}],"name":"contenthashAndTimestamp","outputs":[{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"internalType":"bytes32","name":"node","type":"bytes32"},{"internalType":"string","name":"key","type":"string"},{"internalType":"address","name":"owner","type":"address"}],"name":"textAndTimestamp","outputs":[{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"view","type":"function"}
   ];
 const contract = new web3.eth.Contract(abi, registry);
 
@@ -19,7 +19,7 @@ exports.gateway = async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.set('Access-Control-Allow-Methods', '*');
     res.set('Access-Control-Allow-Headers', '*');
-    res.status(204).send('');
+    return res.status(204).send('');
   } else {
     try {
       const { functionSelector, callDataWithoutSelector, authorized, block } = decodeData(req.body);
@@ -33,8 +33,6 @@ exports.gateway = async (req, res) => {
 
 function decodeData(body) {
   const data = typeof body === 'object' ? body.data || body.Data : JSON.parse(body).data || JSON.parse(body).Data;
-  console.log(body);
-  console.log(data);
   const decoded = web3.eth.abi.decodeParameters(['bytes4', 'bytes', 'address', 'uint256'], data);
   return {
     functionSelector: decoded[0],
@@ -69,11 +67,15 @@ function rlpEncodeProofs(proofs){
 async function handleAddr(callData, authorized, blockNumber, res) {
     
     const node = web3.eth.abi.decodeParameter('bytes32', callData);
-    const result = await contract.methods.addr(node, authorized).call({},blockNumber);
+    const rawresult = await contract.methods.addrAndTimestamp(node, authorized).call({},blockNumber);
 
-    if (result === '0x0000000000000000000000000000000000000000') {
-      return res.send({ data: result });
+    if (rawresult == '0x'){
+       return res.send({"data": rawresult});
     }
+
+    const decoded = web3.eth.abi.decodeParameters(['bytes', 'uint256'], rawresult);
+    const result = decoded[0];
+    const timestamp = Number(decoded[1]);
     
     const encodedResult = web3.eth.abi.encodeParameter('address', result);
     const finalSlot = await calculateCoinAddrSlot(node, 60, authorized);
@@ -87,11 +89,24 @@ async function handleCoinAddr(callData, authorized, blockNumber, res) {
     const decodedVars = web3.eth.abi.decodeParameters(['bytes32', 'uint256'], callData);
     const node = decodedVars[0];
     const coinType = Number(decodedVars[1]);
-    const result = await contract.methods.addr(node, coinType, authorized).call({},blockNumber);
+    var rawresult;
+    rawresult = await contract.methods.addrAndTimestamp(node, coinType, authorized).call({},blockNumber);
 
-    if (result == '0x'){
-       return res.send({"data": result});
+    if (rawresult == '0x'){
+       if (coinType > 2147483648){
+          rawresult = await contract.methods.addrAndTimestamp(node, 2147483648, authorized).call({},blockNumber); 
+          if (rawresult == '0x'){
+             return res.send({"data": rawresult});  
+          }
+       }
+       else{
+          return res.send({"data": rawresult}); 
+       }
     }
+    
+    const decoded = web3.eth.abi.decodeParameters(['bytes', 'uint256'], rawresult);
+    const result = decoded[0];
+    const timestamp = Number(decoded[1]);
     
     const encodedResult = web3.eth.abi.encodeParameter('bytes', result);
     const finalSlot = await calculateCoinAddrSlot(node, coinType, authorized);
@@ -101,11 +116,15 @@ async function handleCoinAddr(callData, authorized, blockNumber, res) {
 
 async function handleContent(callData, authorized, blockNumber, res) {
     const node = web3.eth.abi.decodeParameter('bytes32', callData);
-    const result = await contract.methods.contenthash(node, authorized).call({},blockNumber);
-
-    if (result == '0x'){
-       return res.send({"data": result});
+    const rawresult = await contract.methods.contenthashAndTimestamp(node, authorized).call({},blockNumber);
+    
+    if (rawresult == '0x'){
+       return res.send({"data": rawresult});
     }
+
+    const decoded = web3.eth.abi.decodeParameters(['bytes', 'uint256'], rawresult);
+    const result = decoded[0];
+    const timestamp = Number(decoded[1]);
     
     const encodedResult = web3.eth.abi.encodeParameter('bytes', result);
     const finalSlot = await calculateContentSlot(node, authorized);
@@ -117,11 +136,15 @@ async function handleText(callData, authorized, blockNumber, res) {
     const decodedVars = web3.eth.abi.decodeParameters(['bytes32', 'string'], callData);
     const node = decodedVars[0];
     const key = decodedVars[1];
-    const result = await contract.methods.text(node, key, authorized).call({},blockNumber);
-
-    if (result == ''){
-       return res.send({"data": result});
+    const rawresult = await contract.methods.textAndTimestamp(node, key, authorized).call({},blockNumber);
+    
+    if (rawresult == '0x'){
+       return res.send({"data": rawresult});
     }
+    
+    const decoded = web3.eth.abi.decodeParameters(['string', 'uint256'], rawresult);
+    const result = Number(decoded[0]);
+    const timestamp = decoded[1];
     
     const encodedResult = web3.eth.abi.encodeParameter('string', result);
     const finalSlot = await calculateTextSlot(node, key, authorized);
@@ -130,6 +153,7 @@ async function handleText(callData, authorized, blockNumber, res) {
 }
 
 async function returnProof(encodedResult, finalSlot, blockNumber, res) {
+
     const [proof, withdrawProof, blockdetails] = await Promise.all([
       web3.eth.getProof(registry, [finalSlot], blockNumber),
       web3.eth.getProof(withdrawal, ['0x0000000000000000000000000000000000000000000000000000000000000000'], blockNumber),
@@ -145,7 +169,6 @@ async function returnProof(encodedResult, finalSlot, blockNumber, res) {
         ['bytes', 'bytes32', 'bytes', 'bytes32', 'bytes32', 'bytes32'],
         [encodedResult, finalSlot, hexProof, stateRoot, withdrawalStorageRoot, latestBlockhash]
     );
-
     res.send({"data": returndata});
 }
 
