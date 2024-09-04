@@ -2,7 +2,7 @@
 
 Welcome to the **ENS Superchain Resolver** documentation! This project enables scalable and efficient storage and management of ENS records on superchains such as OP Mainnet and Base, while ensuring data integrity through verifiable storage proofs. 🎉
 
-![ENS Superchain Resolver](https://via.placeholder.com/800x400.png?text=ENS+Superchain+Resolver)
+![ENS Superchain Resolver](https://via.placeholder.com/800x200.png?text=ENS+Superchain+Resolver)
 
 ## 📑 Table of Contents
 
@@ -33,7 +33,7 @@ The ENS Superchain Resolver is a next-generation solution for managing ENS recor
 - **Trust-Minimized**: Provides verifiable storage proofs, ensuring that records returned are authentic and untampered.
 - **Compatible with CCIP**: Integrates with the Cross-Chain Interoperability Protocol to facilitate secure cross-chain communication.
 
-![How It Works](https://via.placeholder.com/800x400.png?text=How+ENS+Superchain+Resolver+Works)
+![How It Works](https://via.placeholder.com/800x200.png?text=How+ENS+Superchain+Resolver+Works)
 
 ## 🏗️ System Architecture
 
