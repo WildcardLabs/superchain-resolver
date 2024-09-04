@@ -181,12 +181,21 @@ These smart contracts are deployed on OP Mainnet and Base to store ENS records. 
 
 ### 👩‍💻 For Developers
 
-1. **Integrate with the ENS Superchain Resolver:**
+1. **Deploy Your Own Instances of the Smart Contracts:**
+   - Deploy the ENS Superchain Resolver Contract on Ethereum mainnet (L1).
+   - Deploy the ENS Records Smart Contracts on the desired L2 chains (e.g., OP Mainnet and Base).
+
+2. **Run Your Own CCIP Gateway Server:**
+   - Clone the gateway server repository and deploy your own instance.
+   - Configure the server to handle requests from your deployed L1 resolver and query the corresponding L2 contracts.
+
+3. **Set the Gateway URL in the L1 Resolver Contract:**
+   - After deploying the L1 resolver, set the URL of your deployed CCIP Gateway Server API in the resolver contract. This URL is necessary for the L1 resolver to communicate with the Gateway Server to fetch and verify off-chain data.
+
+4. **Integrate with the ENS Superchain Resolver:**
    - Ensure your dApp or client supports CCIP read functionality.
    - Use the `ethers.js` library or any CCIP-enabled client to query the resolver.
 
-2. **Run Your Gateway Server:**
-   - Clone the gateway server repository and deploy your own instance.
 
 ## 💻 Code Snippets
 
