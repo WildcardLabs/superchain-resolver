@@ -107,7 +107,7 @@ async function handleAddr(callData, authorized, blockNumber, res) {
     returnProof(encodedResult, finalSlot, blockNumber, res);
 }
 ```
-### Recalling the L1 Contract with Proofs
+### 🏗️ Recalling the L1 Contract with Proofs
 After the gateway server generates the required proofs, the L1 contract is recalled with these proofs to verify the authenticity of the data. This ensures that the L1 contract can validate the records returned by the gateway server using the provided storage proofs.
 
 Here's the Solidity function for resolving with proofs on the L1 contract:
