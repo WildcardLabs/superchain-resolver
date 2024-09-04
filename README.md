@@ -54,7 +54,7 @@ contract OP_Resolver is Ownable {
     constructor(address initialOwner, string memory _url, address[] memory _signers, address oracle, address registry) Ownable(initialOwner) {
         url = _url;
         DisputeOracle = oracle;
-        deployedRegistryOnBase = registry;
+        deployedRegistryOnL2 = registry;
         for (uint i = 0; i < _signers.length; i++) {
             signers[_signers[i]] = true;
         }
