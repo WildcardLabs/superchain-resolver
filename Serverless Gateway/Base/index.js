@@ -147,8 +147,8 @@ async function handleText(callData, authorized, blockNumber, res) {
     }
     
     const decoded = web3.eth.abi.decodeParameters(['string', 'uint256'], rawresult);
-    const result = Number(decoded[0]);
-    const timestamp = decoded[1];
+    const result = decoded[0];
+    const timestamp = Number(decoded[1]);
     
     const encodedResult = web3.eth.abi.encodeParameter('string', result);
     const finalSlot = await calculateTextSlot(node, key, authorized);
