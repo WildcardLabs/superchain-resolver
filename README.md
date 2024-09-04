@@ -107,6 +107,45 @@ async function handleAddr(callData, authorized, blockNumber, res) {
     returnProof(encodedResult, finalSlot, blockNumber, res);
 }
 ```
+### Recalling the L1 Contract with Proofs
+After the gateway server generates the required proofs, the L1 contract is recalled with these proofs to verify the authenticity of the data. This ensures that the L1 contract can validate the records returned by the gateway server using the provided storage proofs.
+
+Here's the Solidity function for resolving with proofs on the L1 contract:
+
+```solidity
+function resolveWithProof(bytes calldata response, bytes calldata extraData) external view returns (bytes memory result) {
+    bytes memory encodedResult;
+    ProofData memory proof;
+    bytes32 withdrawalStorageRoot;
+    bytes32 latestBlockhash;
+    bytes4 functionSelector;
+    uint256 blockNumber;
+    (functionSelector, , , blockNumber) = abi.decode(extraData, (bytes4, bytes, address, uint256));
+    (encodedResult, proof.slotPosition, proof.proofsBlob, proof.stateRoot, withdrawalStorageRoot, latestBlockhash) = abi.decode(response, (bytes, bytes32, bytes, bytes32, bytes32, bytes32));
+    
+    require(compareOutputRoot(proof.stateRoot, withdrawalStorageRoot, latestBlockhash, blockNumber) == true, "Output root comparison failed");
+
+    if (functionSelector == 0xf1cb7e06 || functionSelector == 0xbc1c58d1) {
+        require(getValueFromStateProof(proof.stateRoot, deployedRegistryOnBase, proof.slotPosition, proof.proofsBlob) == keccak256(abi.encodePacked(abi.decode(encodedResult, (bytes)))), "StorageProof Value Mismatch");
+        return encodedResult;
+    }
+
+    if (functionSelector == 0x3b3b57de) {
+        require(getValueFromStateProof(proof.stateRoot, deployedRegistryOnBase, proof.slotPosition, proof.proofsBlob) == keccak256(abi.encodePacked(abi.decode(encodedResult, (address)))), "StorageProof Value Mismatch");
+        return encodedResult;
+    }
+
+    if (functionSelector == 0x59d1d43c) {
+        require(getValueFromStateProof(proof.stateRoot, deployedRegistryOnBase, proof.slotPosition, proof.proofsBlob) == keccak256(abi.encodePacked(abi.decode(encodedResult, (string)))), "StorageProof Value Mismatch");
+        return encodedResult;
+    }
+}
+
+```
+This function verifies the proofs received from the gateway server by comparing the state root and storage proof values, ensuring data integrity and trustworthiness before returning the final resolved record.
+
+
+
 ### 📝 ENS Records Smart Contracts (L2)
 
 These smart contracts are deployed on OP Mainnet and Base to store ENS records. Users interact with these contracts to set or update their ENS records (e.g., address records, content hashes, text records).
