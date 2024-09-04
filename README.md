@@ -33,8 +33,7 @@ The ENS Superchain Resolver is a next-generation solution for managing ENS recor
 - **Trust-Minimized**: Provides verifiable storage proofs, ensuring that records returned are authentic and untampered.
 - **Compatible with CCIP**: Integrates with the Cross-Chain Interoperability Protocol to facilitate secure cross-chain communication.
 
-![How It Works](https://i.ibb.co/dtnWDtP/ensd.png)
-<img width="800px" src="https://i.ibb.co/dtnWDtP/ensd.png" alt="image_name png" />
+![ensd (1)](https://github.com/user-attachments/assets/0d11669f-72ee-40bf-9b9c-307fb08078cd)
 
 ## 🏗️ System Architecture
 
