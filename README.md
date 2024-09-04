@@ -2,7 +2,7 @@
 
 Welcome to the **ENS Superchain Resolver** documentation! This project enables scalable and efficient storage and management of ENS records on superchains such as OP Mainnet and Base, while ensuring data integrity through verifiable storage proofs. 🎉
 
-![ENS Superchain Resolver](https://i.ibb.co/dtnWDtP/ensd.png)
+![ENS Superchain Resolver]([https://i.ibb.co/dtnWDtP/ensd.png](https://via.placeholder.com/800x400.png?text=ENS+Superchain+Resolver))
 
 ## 📑 Table of Contents
 
