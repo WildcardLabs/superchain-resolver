@@ -1,4 +1,4 @@
-| Milestone | Source of Truth | Deadline |
+| Milestone | Links | Status |
 |---|---|---|
 | Deploy CCIP-Read Gateway Server | 1. [Transaction showing BASE Gateway url added to BASE Resolver (Mainnet)](https://etherscan.io/tx/0x8a62b2842846d4e406a13474ff351b77ed8fb3a175d7710dbafc54676e5b4bc0) 2. [Transaction showing OP Gateway url added to OP Resolver (Mainnet)](https://etherscan.io/tx/0x1181bbfa04950528c54a08450f3231f6825de56b7210b1e99719d03e16cbf648) 2. [Gateway API url (BASE)](https://us-central1-superchain-resolver.cloudfunctions.net/gateway) 3. [Gateway API url (OP Mainnet)](https://us-central1-superchain-resolver.cloudfunctions.net/gateway-op) 4. [CCIP Gateway Github Code (OP & BASE)](https://github.com/WildcardLabs/superchain-resolver/tree/main/Serverless%20Gateway)| :white_check_mark: completed|
 | Deploy ENS Records-Registry contract on OP Mainnet (verified) | [Contract address](https://optimistic.etherscan.io/address/0xBBe22aAa5E8e29800CE9EE168670DBF8B7aF1222#code), [Open-source Code on Github](https://github.com/WildcardLabs/superchain-resolver/blob/main/contracts/opregistry.sol) | :white_check_mark: completed|
