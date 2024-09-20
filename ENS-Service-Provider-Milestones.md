@@ -7,3 +7,4 @@
 | Deploy ENS ➡️ Base Resolver Contract on L1 (Ethereum)| [Contract address](https://etherscan.io/address/0xA4b6530c6422ED8b2F63127d27637B7d56908EAd#code), [Open-source Code](https://github.com/WildcardLabs/superchain-resolver/blob/main/contracts/baseresolver.sol) | :white_check_mark: completed|
 | Open-Source our gateway code, contracts and provide documentation for the Superchain Resolver | [Public Github Repo](https://github.com/WildcardLabs/superchain-resolver/blob/main/README.md) | :white_check_mark: completed |
 | Unified Cross-L2 Resolver | in progress | in progress |
+| Records UI with ccip write support (ERC-7700) | in progress | in progress |
